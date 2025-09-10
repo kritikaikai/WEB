@@ -42,6 +42,29 @@
           box-shadow: 0 0 30px 0 #38bdf8, 0 0 60px 0 #1e293b;
         }
       }
+
+      /* Album Image Animated Border */
+      .album img {
+        border-radius: 10px;
+        border: 2px solid #38bdf8;
+        box-shadow: 0 0 20px 0 #38bdf8;
+        animation: albumBorderAnim 2.5s linear infinite;
+        transition: transform 0.3s;
+      }
+      @keyframes albumBorderAnim {
+        0% {
+          border-color: #38bdf8;
+          box-shadow: 0 0 20px 0 #38bdf8;
+        }
+        50% {
+          border-color: #0ea5e9;
+          box-shadow: 0 0 40px 10px #0ea5e9;
+        }
+        100% {
+          border-color: #38bdf8;
+          box-shadow: 0 0 20px 0 #38bdf8;
+        }
+      }
     </style>
   <style>
     /* General Reset */
@@ -164,6 +187,8 @@
       <a href="#about">About</a>
       <a href="#projects">Projects</a>
       <a href="#contact">Contact</a>
+    <a href="#album">Album</a>
+    <a href="#location">Location</a>
     </nav>
   </header>
 
@@ -195,6 +220,58 @@
       
     </div>
   </section>
+
+    <!-- Album -->
+    <section id="album" class="album">
+      <h2>Photo Album</h2>
+      <div style="display: flex; flex-wrap: wrap; gap: 1.5rem; justify-content: center;">
+  <img src="https://cdn.britannica.com/39/226539-050-D21D7721/Portrait-of-a-cat-with-whiskers-visible.jpg" alt="Cat Portrait" style="width:220px; height:220px; object-fit:cover; border-radius: 10px; border: 2px solid #38bdf8; box-shadow: 0 0 20px 0 #38bdf8; animation: albumBorderAnim 2.5s linear infinite;">
+    <img src="https://images.theconversation.com/files/651621/original/file-20250226-32-jxjhmy.jpg" alt="Cat Portrait 2" style="width:220px; height:220px; object-fit:cover; border-radius: 10px; border: 2px solid #38bdf8; box-shadow: 0 0 20px 0 #38bdf8; animation: albumBorderAnim 2.5s linear infinite;">
+  <img src="https://plus.unsplash.com/premium_photo-1667030474693-6d0632f97029?fm=jpg&q=60&w=3000&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8Y2F0fGVufDB8fDB8fHww" alt="Cat Portrait 3" style="width:220px; height:220px; object-fit:cover; border-radius: 10px; border: 2px solid #38bdf8; box-shadow: 0 0 20px 0 #38bdf8; animation: albumBorderAnim 2.5s linear infinite;">
+      </div>
+      <p style="text-align:center; margin-top:1rem; color:#cbd5e1;">Click photos to view larger.</p>
+
+      <!-- Music Album -->
+      <div style="margin-top:2rem;">
+        <h3 style="color:#38bdf8; text-align:center;">Music Album</h3>
+        <div style="display:flex; justify-content:center; gap:2rem; flex-wrap:wrap;">
+          <audio controls style="border-radius:10px; border:2px solid #38bdf8; box-shadow:0 0 20px 0 #38bdf8; width:250px;">
+            <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+            Your browser does not support the audio element.
+          </audio>
+          <audio controls style="border-radius:10px; border:2px solid #38bdf8; box-shadow:0 0 20px 0 #38bdf8; width:250px;">
+            <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" type="audio/mpeg">
+            Your browser does not support the audio element.
+          </audio>
+        </div>
+      </div>
+
+      <!-- Video Album -->
+      <div style="margin-top:2rem;">
+        <h3 style="color:#38bdf8; text-align:center;">Video Album</h3>
+        <div style="display:flex; justify-content:center; gap:2rem; flex-wrap:wrap;">
+          <video controls style="border-radius:10px; border:2px solid #38bdf8; box-shadow:0 0 20px 0 #38bdf8; width:320px; height:180px;">
+            <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
+          <video controls style="border-radius:10px; border:2px solid #38bdf8; box-shadow:0 0 20px 0 #38bdf8; width:320px; height:180px;">
+            <source src="https://www.w3schools.com/html/movie.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
+        </div>
+      </div>
+    </section>
+
+    <!-- Location -->
+    <section id="location" class="location">
+      <h2>My Location</h2>
+      <div style="text-align:center;">
+        <a href="https://www.google.com/maps/place/Davao+City" target="_blank" style="color:#38bdf8; font-size:1.1rem;">View on Google Maps</a>
+        <div style="margin-top:1rem;">
+          <iframe src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d26094.38861895058!2d125.69701656203436!3d7.304044358486631!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e1!3m2!1sen!2sph!4v1757474796285!5m2!1sen!2sph" width="300" height="200" style="border:2px solid #38bdf8; border-radius:10px;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        </div>
+      </div>
+    </section>
 
   <!-- Contact -->
   <section id="contact" class="contact">
