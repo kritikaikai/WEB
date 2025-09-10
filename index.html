@@ -4,6 +4,45 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>My Personal Website</title>
+    <style>
+      /* Animated Background */
+      body::before {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: -1;
+        background: linear-gradient(270deg, #0f172a, #38bdf8, #1e293b, #0f172a);
+        background-size: 600% 600%;
+        animation: gradientBG 16s ease infinite;
+      }
+      @keyframes gradientBG {
+        0% {background-position:0% 50%;}
+        50% {background-position:100% 50%;}
+        100% {background-position:0% 50%;}
+      }
+      /* Profile Image Animation */
+      .about img {
+        animation: profilePulse 2.5s infinite alternate;
+        box-shadow: 0 0 30px 0 #38bdf8, 0 0 60px 0 #1e293b;
+      }
+      @keyframes profilePulse {
+        0% {
+          transform: scale(1) rotate(0deg);
+          box-shadow: 0 0 30px 0 #38bdf8, 0 0 60px 0 #1e293b;
+        }
+        50% {
+          transform: scale(1.08) rotate(2deg);
+          box-shadow: 0 0 50px 10px #38bdf8, 0 0 80px 10px #1e293b;
+        }
+        100% {
+          transform: scale(1) rotate(-2deg);
+          box-shadow: 0 0 30px 0 #38bdf8, 0 0 60px 0 #1e293b;
+        }
+      }
+    </style>
   <style>
     /* General Reset */
     * {
@@ -119,7 +158,7 @@
 <body>
   <!-- Header -->
   <header>
-    <h1>Your Name</h1>
+    <h1>Hi Kit Arvy</h1>
     <p>Web Developer | Designer | Creator</p>
     <nav>
       <a href="#about">About</a>
@@ -131,7 +170,7 @@
   <!-- About -->
   <section id="about" class="about">
     <h2>About Me</h2>
-    <img src="https://via.placeholder.com/150" alt="Profile Picture">
+    <img src="https://scontent.fdvo3-1.fna.fbcdn.net/v/t39.30808-6/453879317_1716107702492619_1285749894268018266_n.jpg?stp=cp6_dst-jpg_tt6&_nc_cat=107&ccb=1-7&_nc_sid=6ee11a&_nc_eui2=AeEwf_YFcWV58XcxR6m8do-JD9fJwMQMjYwP18nAxAyNjHJNJJLHXiNNlr-IpOU72ufPPDzql_OTIUQ0uJZypsjn&_nc_ohc=D1wg9kmBqwgQ7kNvwFc7Vfj&_nc_oc=AdlhlhTZySXs8Vds_LydJe6hdwD9yrWkPZzvDbGC2x36_HGdteaL9kgOM8l8fVkTzGk&_nc_zt=23&_nc_ht=scontent.fdvo3-1.fna&_nc_gid=oYiqlJL4K8L1zGQnbyWTNQ&oh=00_AfZiQQhPC9ZXqmr3Cp5nPoKOc1WUCIhqtvHjRjUK_VMxDQ&oe=68C6CB23" alt="Profile Photo">
     <p>Hello! I'm a passionate developer who loves creating clean and modern websites. I enjoy learning new technologies and building projects that make an impact.</p>
   </section>
 
@@ -152,11 +191,7 @@
         <p>A short description of your project goes here.</p>
       </div>
       
-      <!-- Project Three -->
-      <div class="project-card">
-        <h3>Project Three</h3>
-        <p>A short description of your project goes here.</p>
-      </div>
+      
       
     </div>
   </section>
