@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Army Green Saturn Login</title>
+  <style>
+    :root{
+      --army: #4b5320; 
+      --accent: #d9e7c2;
+    }
+    body,html{
+      height:100%;
+      margin:0;
+      font-family: Arial, sans-serif;
+      background: var(--army);
+      overflow:hidden;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      color:white;
+    }
+
+    /* Saturn + stars animation */
+    #universe{
+      position:absolute;
+      top:0; left:0;
+      width:100%; height:100%;
+      overflow:hidden; z-index:-1;
+    }
+    .star{
+      position:absolute;
+      width:2px; height:2px;
+      background:white;
+      border-radius:50%;
+      animation: twinkle 2s infinite alternate;
+    }
+    @keyframes twinkle{
+      from{opacity:0.2;}
+      to{opacity:1;}
+    }
+    .saturn{
+      position:absolute;
+      top:50%; left:50%;
+      width:100px; height:100px;
+      margin:-50px;
+      border-radius:50%;
+      background:#c2b280;
+      box-shadow: inset -10px -10px 30px rgba(0,0,0,0.5);
+    }
+    .ring{
+      position:absolute;
+      top:50%; left:50%;
+      width:180px; height:40px;
+      margin:-20px -90px;
+      border:5px solid #ddd;
+      border-radius:50%;
+      transform:rotate(25deg);
+      animation: spin 20s linear infinite;
+    }
+    @keyframes spin{
+      from{transform:rotate(0deg);}
+      to{transform:rotate(360deg);}
+    }
+
+    /* Login box */
+    .login-box{
+      background:rgba(0,0,0,0.6);
+      padding:20px;
+      border-radius:12px;
+      text-align:center;
+      width:300px;
+    }
+    .login-box h2{
+      margin-bottom:15px;
+    }
+    .login-box input{
+      width:90%;
+      padding:10px;
+      margin:8px 0;
+      border:none;
+      border-radius:6px;
+    }
+    .login-box button{
+      width:100%;
+      padding:10px;
+      background:var(--accent);
+      border:none;
+      border-radius:6px;
+      cursor:pointer;
+      font-weight:bold;
+    }
+  </style>
+</head>
+<body>
+  <div id="universe"></div>
+  
+  <div class="login-box">
+    <h2>Login</h2>
+    <input type="email" id="email" placeholder="Enter Gmail" required>
+    <input type="password" id="password" placeholder="Enter Password" required>
+    <button onclick="login()">Log In</button>
+    <p id="message"></p>
+  </div>
+
+  <script>
+    // stars generator
+    const uni=document.getElementById("universe");
+    for(let i=0;i<100;i++){
+      const s=document.createElement("div");
+      s.className="star";
+      s.style.top=Math.random()*100+"%";
+      s.style.left=Math.random()*100+"%";
+      s.style.animationDuration=(1+Math.random()*2)+"s";
+      uni.appendChild(s);
+    }
+    // add saturn + ring
+    const saturn=document.createElement("div");
+    saturn.className="saturn";
+    uni.appendChild(saturn);
+    const ring=document.createElement("div");
+    ring.className="ring";
+    uni.appendChild(ring);
+
+    function login(){
+      const email=document.getElementById("email").value;
+      const pass=document.getElementById("password").value;
+      const msg=document.getElementById("message");
+      if(!email.endsWith("@gmail.com")){
+        msg.textContent="Only Gmail is allowed!";
+        msg.style.color="red";
+        return;
+      }
+      if(pass.trim()===""){
+        msg.textContent="Enter password!";
+        msg.style.color="red";
+        return;
+      }
+      msg.textContent="Login Successful!";
+      msg.style.color="lightgreen";
+      setTimeout(()=>{window.location.href="calculator.html";},1000);
+    }
+  </script>
+</body>
+</html>
