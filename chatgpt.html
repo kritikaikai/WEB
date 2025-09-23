@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bootstrap Dark Layout with Sidebar</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+    <style>
+        body {
+            background-color: #000;
+            color: #fff;
+        }
+
+        /* Sidebar styles */
+        .sidebar {
+            height: 100vh;
+            width: 250px;
+            background-color: #121212;
+            padding-top: 20px;
+            position: fixed;
+            overflow-y: auto;
+            left: 0;
+            top: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar a {
+            padding: 10px 15px;
+            color: #fff;
+            display: block;
+            text-decoration: none;
+        }
+
+        .sidebar a:hover {
+            background-color: #212529;
+        }
+
+        .content {
+            margin-left: 250px;
+            padding: 20px;
+        }
+
+        .search-bar {
+            margin: 0 15px 20px 15px;
+        }
+
+        .dropdown-menu {
+            background-color: #121212;
+            border: none;
+        }
+
+        .dropdown-item {
+            color: #fff;
+        }
+
+        .dropdown-item:hover {
+            background-color: #212529;
+        }
+
+        hr {
+            border-color: #333;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                position: static;
+                height: auto;
+            }
+
+            .content {
+                margin-left: 0;
+            }
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 50vh;
+            padding: 20px;
+        }
+
+        .btn-custom {
+            margin: 5px;
+        }
+
+        .form-control {
+            background-color: #333;
+            color: #fff;
+            border: none;
+        }
+
+        .form-control:focus {
+            background-color: #555;
+            color: #fff;
+            box-shadow: none;
+            border: none;
+        }
+
+        .get-plus-button {
+            background-color: #4a148c;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+        .get-plus-button:hover {
+            background-color: #6a1b9a;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            padding: 10px;
+        }
+
+        .rotating {
+            animation: rotation 2s infinite linear;
+        }
+
+        @keyframes rotation {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(359deg);
+            }
+        }
+
+        /* Profile section styles */
+        .profile-section {
+            margin-top: auto;
+            padding: 10px;
+            border-top: 1px solid #333;
+        }
+
+        .profile-button {
+            width: 100%;
+            text-align: left;
+            padding: 8px 15px;
+            border: none;
+            background-color: transparent;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        .profile-button:hover {
+            background-color: #212529;
+        }
+
+        /* Logout modal styles */
+        .modal-content {
+            background-color: #121212;
+            color: #fff;
+            border: 1px solid #333;
+        }
+
+        .modal-header {
+            border-bottom: 1px solid #333;
+        }
+
+        .modal-footer {
+            border-top: 1px solid #333;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="d-flex">
+
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="search-bar">
+                <div class="input-group">
+                    <input type="text" class="form-control form-control-sm" placeholder="Search" aria-label="Search">
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-secondary btn-sm" type="button">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <a href="#" onclick="loadContent('new')"><i class="fas fa-plus-circle mr-2"></i> New chat</a>
+            <a href="#" onclick="loadContent('library')"><i class="fas fa-book mr-2"></i> Library</a>
+            <a href="#" onclick="loadContent('gpts')"><i class="fas fa-th-large mr-2"></i> GPTs</a>
+
+            <hr>
+
+            <a href="#" onclick="loadContent('wifi')">Wi-Fi password recovery</a>
+            <a href="#" onclick="loadContent('vscode')">VS Code personal website</a>
+            <a href="#" onclick="loadContent('mlbb')">MLBB server region ID</a>
+
+            <!-- Profile Section -->
+            <div class="profile-section">
+                <button class="profile-button" data-toggle="modal" data-target="#logoutModal">
+                    <i class="fas fa-user-circle mr-2"></i>kriti kai
+                </button>
+            </div>
+        </div>
+
+        <!-- Page Content -->
+        <div class="content">
+            <div class="top-bar">
+                <div>
+                    <button class="btn btn-sm btn-outline-light"><i class="fas fa-bars"></i></button>
+                </div>
+                <div>
+                    <button class="get-plus-button">
+                        <i class="fas fa-star"></i> Get Plus
+                    </button>
+                </div>
+                <div>
+                    <button class="btn btn-sm btn-outline-light">
+                        <i class="fas fa-sync-alt rotating"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="container" id="main-container">
+                <h1>What can I help with?</h1>
+                <div>
+                    <button class="btn btn-secondary btn-custom"><i class="fas fa-image"></i> Create image</button>
+                    <button class="btn btn-secondary btn-custom"><i class="fas fa-file-alt"></i> Summarize text</button>
+                    <button class="btn btn-secondary btn-custom"><i class="fas fa-code"></i> Code</button>
+                    <button class="btn btn-secondary btn-custom"><i class="fas fa-chart-bar"></i> Analyze data</button>
+                    <button class="btn btn-secondary btn-custom">More</button>
+                </div>
+                <div class="input-group mt-3">
+                    <div class="input-group-prepend">
+                        <button class="btn btn-outline-secondary" type="button"><i class="fas fa-camera"></i></button>
+                    </div>
+                    <input type="text" class="form-control" placeholder="Ask anything" aria-label="Ask anything">
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-secondary" type="button"><i class="fas fa-microphone"></i></button>
+                        <button class="btn btn-outline-secondary" type="button"><i class="fas fa-sliders-h"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Logout Modal -->
+    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="logoutModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="logoutModalLabel">Ready to Leave?</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    Select "Logout" below if you are ready to end your current session.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <a class="btn btn-primary" href="#" onclick="logout()">Logout</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS, Popper.js, and jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script>
+        // Sidebar toggle (mobile)
+        document.querySelector('.btn-sm.btn-outline-light').addEventListener('click', function () {
+            document.querySelector('.sidebar').classList.toggle('d-none');
+        });
+
+        // Function to change page content
+        function loadContent(page) {
+            const content = document.getElementById('main-container');
+            if (page === 'new') {
+                content.innerHTML = `
+                    <h1>Start a New Chat</h1>
+                    <p>Type your first message below to begin a conversation.</p>
+                    <div class="input-group mt-3">
+                        <input type="text" class="form-control" placeholder="Say something...">
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-secondary"><i class="fas fa-paper-plane"></i></button>
+                        </div>
+                    </div>
+                `;
+            }
+            else if (page === 'library') {
+                content.innerHTML = `
+                    <h1>📚 My Library</h1>
+                    <p>Here are your saved items:</p>
+                    <ul class="list-group">
+                        <li class="list-group-item bg-dark text-white">Chat History 1 - Wi-Fi password recovery</li>
+                        <li class="list-group-item bg-dark text-white">Chat History 2 - VS Code personal website</li>
+                        <li class="list-group-item bg-dark text-white">Chat History 3 - MLBB server region ID</li>
+                    </ul>
+                `;
+            }
+            else if (page === 'gpts') {
+                content.innerHTML = `
+                    <h1>🤖 GPTs</h1>
+                    <p>Explore available GPT models here.</p>
+                    <button class="btn btn-primary mt-2"><i class="fas fa-plus-circle"></i> Add GPT</button>
+                `;
+            }
+            else if (page === 'wifi') {
+                content.innerHTML = `
+                    <h1>🔑 Wi-Fi Password Recovery</h1>
+                    <p>Instructions on how to recover your Wi-Fi password will be shown here.</p>
+                `;
+            }
+            else if (page === 'vscode') {
+                content.innerHTML = `
+                    <h1>💻 VS Code Personal Website</h1>
+                    <p>Guide and files for creating a personal website using VS Code.</p>
+                `;
+            }
+            else if (page === 'mlbb') {
+                content.innerHTML = `
+                    <h1>🎮 MLBB Server Region ID</h1>
+                    <p>Information about MLBB server regions based on IDs.</p>
+                `;
+            }
+        }
+
+        // Logout functionality
+        function logout() {
+            // *** REPLACE THESE WITH YOUR ACTUAL LOGOUT LOGIC ***
+
+            // Example: Clear local storage and redirect to login page
+            localStorage.removeItem('authToken');
+            window.location.href = '/login'; // Replace with your login page URL
+
+            // *** END OF LOGOUT LOGIC ***
+        }
+    </script>
+
+</body>
+
+</html>
