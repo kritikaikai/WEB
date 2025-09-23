@@ -1,147 +1,318 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-   <link rel="icon" type="image/png" href="n.jpg"> 
-  <title>Army Green Saturn Login</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Animated Login Form</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <style>
-    :root{
-      --army: #4b5320; 
-      --accent: #d9e7c2;
-    }
-    body,html{
-      height:100%;
-      margin:0;
-      font-family: Arial, sans-serif;
-      background: var(--army);
-      overflow:hidden;
-      display:flex;
-      justify-content:center;
-      align-items:center;
-      color:white;
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; }
+
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background: #000;
+      overflow: hidden;
     }
 
-    /* Saturn + stars animation */
-    #universe{
-      position:absolute;
-      top:0; left:0;
-      width:100%; height:100%;
-      overflow:hidden; z-index:-1;
-    }
-    .star{
-      position:absolute;
-      width:2px; height:2px;
-      background:white;
-      border-radius:50%;
-      animation: twinkle 2s infinite alternate;
-    }
-    @keyframes twinkle{
-      from{opacity:0.2;}
-      to{opacity:1;}
-    }
-    .saturn{
-      position:absolute;
-      top:50%; left:50%;
-      width:100px; height:100px;
-      margin:-50px;
-      border-radius:50%;
-      background:#c2b280;
-      box-shadow: inset -10px -10px 30px rgba(0,0,0,0.5);
-    }
-    .ring{
-      position:absolute;
-      top:50%; left:50%;
-      width:180px; height:40px;
-      margin:-20px -90px;
-      border:5px solid #ddd;
-      border-radius:50%;
-      transform:rotate(25deg);
-      animation: spin 20s linear infinite;
-    }
-    @keyframes spin{
-      from{transform:rotate(0deg);}
-      to{transform:rotate(360deg);}
+    #bgVideo {
+      position: fixed;
+      top: 0;
+      left: 0;
+      min-width: 100%;
+      min-height: 100%;
+      object-fit: cover;
+      z-index: -1;
     }
 
-    /* Login box */
-    .login-box{
-      background:rgba(0,0,0,0.6);
-      padding:20px;
-      border-radius:12px;
-      text-align:center;
-      width:300px;
+    @keyframes gradientMove {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
     }
-    .login-box h2{
-      margin-bottom:15px;
+
+    .form-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      max-width: 400px;
+      z-index: 1;
     }
-    .login-box input{
-      width:90%;
-      padding:10px;
-      margin:8px 0;
-      border:none;
-      border-radius:6px;
+
+    .container {
+      width: 100%;
+      background: rgba(255,255,255,0.1);
+      border-radius: 15px;
+      backdrop-filter: blur(10px);
+      padding: 40px 30px;
+      color: #fff;
+      position: relative;
+      transition: 0.5s ease-in-out;
+      animation: pulseGlow 3s ease-in-out infinite alternate;
+      opacity: 0;
+      transform: translateY(-20px);
+      animation-fill-mode: forwards;
+      margin-top: 20px;
     }
-    .login-box button{
-      width:100%;
-      padding:10px;
-      background:var(--accent);
-      border:none;
-      border-radius:6px;
-      cursor:pointer;
-      font-weight:bold;
+
+    .show { animation: containerShow 0.6s forwards; }
+
+    @keyframes containerShow {
+      0% { opacity: 0; transform: translateY(-20px); }
+      100% { opacity: 1; transform: translateY(0); }
     }
+
+    @keyframes pulseGlow {
+      0% { box-shadow: 0 0 15px rgba(83, 32, 32, 0.658); }
+      50% { box-shadow: 0 0 25px rgba(83, 32, 32, 0.4); }
+      100% { box-shadow: 0 0 15px rgba(83, 32, 32, 0.2); }
+    }
+
+    h2 { text-align: center; margin-bottom: 30px; font-size: 2em; font-weight: 600; }
+
+    .input-field { position: relative; margin-bottom: 25px; }
+    .input-field input {
+      width: 100%;
+      padding: 12px 35px 12px 10px;
+      border-radius: 50px;
+      border: none;
+      outline: none;
+      background: rgba(255,255,255,0.2);
+      color: #ffffff;
+      font-size: 1em;
+      transition: 0.3s, box-shadow 0.3s;
+    }
+    .input-field input:focus { box-shadow: 0 0 8px #0e7dd8; }
+    .input-field label {
+      position: absolute;
+      left: 10px;
+      top: 12px;
+      color: #ddd;
+      font-size: 0.9em;
+      pointer-events: none;
+      transition: 0.3s;
+    }
+    .input-field input:focus + label,
+    .input-field input:not(:placeholder-shown) + label {
+      top: -15px; left: 10px; font-size: 0.8em; color: #ff6b6b;
+    }
+
+    .input-field i {
+      position: absolute;
+      top: 20px;
+      right: 15px;
+      transform: translateY(-50%);
+      color: #fff;
+      cursor: pointer;
+      transition: color 0.3s;
+    }
+    .input-field i:hover { color: #ff6b6b; }
+
+    .btn {
+      width: 100%; padding: 10px; border-radius: 50px; border: none;
+      background: #ff6b6b; color: #fff; font-size: 1.1em;
+      cursor: pointer; transition: 0.3s, transform 0.2s;
+    }
+    .btn:hover { background: #ff4757; transform: scale(1.05); }
+
+    .toggle-link {
+      text-align: center; margin-top: 15px; font-size: 0.9em;
+      cursor: pointer; color: #fff; position: relative;
+    }
+    .toggle-link::after {
+      content: '';
+      display: block;
+      width: 0%;
+      height: 1px;
+      background: #ff0000;
+      transition: 0.3s;
+      margin-top: 2px;
+    }
+    .toggle-link:hover::after { width: 100%; }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-10px); }
+      40%, 80% { transform: translateX(10px); }
+    }
+    .shake { animation: shake 0.4s; }
+
+    .password-hint {
+      font-size: 0.8em;
+      text-align: left;
+      margin-top: 5px;
+      color: #dcdcdc;
+      line-height: 1.4em;
+      background: rgba(255,255,255,0.05);
+      padding: 5px 10px;
+      border-radius: 6px;
+    }
+    .password-hint div { display: flex; align-items: center; gap: 5px; }
+    #lengthBar { height: 100%; width: 0%; border-radius: 5px; transition: width 0.2s, background 0.2s; }
   </style>
 </head>
 <body>
-  <div id="universe"></div>
-  
-  <div class="login-box">
-    <h2>Login</h2>
-    <input type="email" id="email" placeholder="Enter Gmail" required>
-    <input type="password" id="password" placeholder="Enter Password" required>
-    <button onclick="login()">Log In</button>
-    <p id="message"></p>
+
+  <!-- 🌟 Background Video -->
+  <video autoplay loop muted playsinline id="bgVideo">
+    <source src="bgg.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
+
+  <div class="form-wrapper">
+    <!-- LOGIN FORM -->
+    <div class="container login show" id="container">
+      <h2>Login</h2>
+      <div class="input-field">
+        <input type="email" id="loginEmail" placeholder=" " required>
+        <label>Email</label>
+      </div>
+      <div class="input-field">
+        <input type="password" id="loginPass" placeholder=" " required>
+        <label>Password</label>
+        <i class="fa fa-eye" onclick="togglePassword('loginPass', this)"></i>
+      </div>
+      <button class="btn" onclick="login()">Login</button>
+      <p class="toggle-link" onclick="toggleForm()">Don't have an account? Sign Up</p>
+    </div>
+
+    <!-- SIGN UP FORM -->
+    <div class="container signup" id="containerSignup" style="display:none;">
+      <h2>Sign Up</h2>
+      <div class="input-field">
+        <input type="text" id="signupUser" placeholder=" " required>
+        <label>Username</label>
+      </div>
+      <div class="input-field">
+        <input type="email" id="signupEmail" placeholder=" " required>
+        <label>Email</label>
+      </div>
+      <div class="input-field">
+        <input type="password" id="signupPass" placeholder=" " required oninput="updatePasswordHint()">
+        <label>Password</label>
+        <br><br>
+        <i class="fa fa-eye" onclick="togglePassword('signupPass', this)"></i>
+        <div class="password-hint" id="passwordHint">
+          <div><span id="checkLower">❌</span> Lowercase letter (a–z)</div>
+          <div><span id="checkUpper">❌</span> Uppercase letter (A–Z)</div>
+          <div><span id="checkDigit">❌</span> Digit (0–9)</div>
+          <div><span id="checkSpecial">❌</span> Special character (e.g., ! @ # $ %)</div>
+          <div><span id="checkLength">❌</span> Minimum of 8 characters</div>
+          <div style="margin-top:5px; background: rgba(255,255,255,0.2); border-radius:5px; height:6px;">
+            <div id="lengthBar"></div>
+          </div>
+        </div>
+      </div>
+      <button class="btn" onclick="signup()">Sign Up</button>
+      <p class="toggle-link" onclick="toggleForm()">Already have an account? Login</p>
+    </div>
   </div>
 
   <script>
-    // stars generator
-    const uni=document.getElementById("universe");
-    for(let i=0;i<100;i++){
-      const s=document.createElement("div");
-      s.className="star";
-      s.style.top=Math.random()*100+"%";
-      s.style.left=Math.random()*100+"%";
-      s.style.animationDuration=(1+Math.random()*2)+"s";
-      uni.appendChild(s);
+    const loginContainer = document.getElementById('container');
+    const signupContainer = document.getElementById('containerSignup');
+
+    const defaultAccount = { user: "kit", email: "kit@gmail.com", pass: "Kit@1234" };
+    if(!localStorage.getItem('account')) {
+      localStorage.setItem('account', JSON.stringify(defaultAccount));
     }
-    // add saturn + ring
-    const saturn=document.createElement("div");
-    saturn.className="saturn";
-    uni.appendChild(saturn);
-    const ring=document.createElement("div");
-    ring.className="ring";
-    uni.appendChild(ring);
+
+    function toggleForm() {
+      if(loginContainer.style.display !== 'none'){
+        loginContainer.style.display = 'none';
+        signupContainer.style.display = 'block';
+        signupContainer.classList.add('show');
+      } else {
+        loginContainer.style.display = 'block';
+        loginContainer.classList.add('show');
+        signupContainer.style.display = 'none';
+      }
+    }
+
+    function togglePassword(id, icon) {
+      const input = document.getElementById(id);
+      if(input.type === 'password') {
+        input.type = 'text';
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+      } else {
+        input.type = 'password';
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+      }
+    }
+
+    function validatePassword(pass){
+      const lower = /[a-z]/;
+      const upper = /[A-Z]/;
+      const digit = /[0-9]/;
+      const special = /[!@#$%^&*(),.?":{}|<>]/;
+      return lower.test(pass) && upper.test(pass) && digit.test(pass) && special.test(pass) && pass.length >= 8;
+    }
+
+    function validateEmail(email){
+      const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return regex.test(email);
+    }
+
+    function updatePasswordHint(){
+      const pass = document.getElementById('signupPass').value;
+      document.getElementById('checkLower').textContent = /[a-z]/.test(pass) ? '✅' : '❌';
+      document.getElementById('checkUpper').textContent = /[A-Z]/.test(pass) ? '✅' : '❌';
+      document.getElementById('checkDigit').textContent = /[0-9]/.test(pass) ? '✅' : '❌';
+      document.getElementById('checkSpecial').textContent = /[!@#$%^&*(),.?":{}|<>]/.test(pass) ? '✅' : '❌';
+      document.getElementById('checkLength').textContent = pass.length >= 8 ? '✅' : '❌';
+
+      const lengthBar = document.getElementById('lengthBar');
+      let width = Math.min(pass.length / 12 * 100, 100);
+      lengthBar.style.width = width + '%';
+      lengthBar.style.background = pass.length < 8 ? '#ff4d4d' : pass.length < 12 ? '#ffdd57' : '#2ed573';
+    }
+
+    function signup(){
+      const user = document.getElementById('signupUser').value.trim();
+      const email = document.getElementById('signupEmail').value.trim();
+      const pass = document.getElementById('signupPass').value;
+
+      if(user === '' || email === '' || pass === ''){
+        signupContainer.classList.add('shake');
+        setTimeout(() => signupContainer.classList.remove('shake'), 400);
+        alert("Please fill in all fields!");
+        return;
+      }
+      if(!validateEmail(email)){
+        alert("Invalid email format!");
+        return;
+      }
+      if(!validatePassword(pass)){
+        alert("Password does not meet the requirements!");
+        return;
+      }
+
+      localStorage.setItem('account', JSON.stringify({user, email, pass}));
+      alert("Account created successfully! You can now log in.");
+      toggleForm();
+    }
 
     function login(){
-      const email=document.getElementById("email").value;
-      const pass=document.getElementById("password").value;
-      const msg=document.getElementById("message");
-      if(!email.endsWith("@gmail.com")){
-        msg.textContent="Only Gmail is allowed!";
-        msg.style.color="red";
+      const email = document.getElementById('loginEmail').value.trim();
+      const pass = document.getElementById('loginPass').value;
+
+      const savedAccount = JSON.parse(localStorage.getItem('account')) || defaultAccount;
+
+      if(email !== savedAccount.email || pass !== savedAccount.pass){
+        loginContainer.classList.add('shake');
+        setTimeout(() => loginContainer.classList.remove('shake'), 400);
+        alert("Incorrect email or password!");
         return;
       }
-      if(pass.trim()===""){
-        msg.textContent="Enter password!";
-        msg.style.color="red";
-        return;
-      }
-      msg.textContent="Login Successful!";
-      msg.style.color="lightgreen";
-      setTimeout(()=>{window.location.href="calculator.html";},1000);
+
+      alert(`Welcome back, ${savedAccount.user}!`);
+      window.location.href = "calculator.html";
     }
   </script>
 </body>
 </html>
-
