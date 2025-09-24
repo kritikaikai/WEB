@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>To-Do List with Dark Mode and Network Animation</title>
+  <style>
+    :root {
+      --bg-light: #fff;
+      --text-light: #222;
+      --bg-dark: #121212;
+      --text-dark: #ddd;
+      --primary: #007bff;
+      --danger: #ff4d4d;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 450px;
+      margin: 40px auto;
+      padding: 0 20px;
+      background-color: var(--bg-light);
+      color: var(--text-light);
+      transition: background-color 0.6s ease, color 0.6s ease;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    body.dark {
+      background-color: var(--bg-dark);
+      color: var(--text-dark);
+    }
+
+    #rain, #bubbles, #network {
+      pointer-events: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      z-index: 0;
+      display: none;
+    }
+
+    .drop {
+      position: absolute;
+      bottom: 100%;
+      width: 2px;
+      height: 15px;
+      background: rgba(174,194,224,0.5);
+      animation-name: fall;
+      animation-timing-function: linear;
+      animation-iteration-count: infinite;
+      border-radius: 50%;
+      opacity: 0.5;
+    }
+
+    body.dark .drop {
+      background: rgba(180, 220, 255, 0.7);
+    }
+
+    @keyframes fall {
+      to {
+        transform: translateY(100vh);
+        opacity: 0;
+      }
+    }
+
+    .bubble {
+      position: absolute;
+      bottom: -50px;
+      background: rgba(135, 206, 250, 0.3);
+      border-radius: 50%;
+      animation-timing-function: ease-in-out;
+      animation-iteration-count: infinite;
+      opacity: 0.6;
+      filter: drop-shadow(0 0 4px rgba(135,206,250,0.5));
+    }
+
+    @keyframes rise {
+      0% {
+        transform: translateY(0) scale(1);
+        opacity: 0.6;
+      }
+      50% {
+        opacity: 0.8;
+      }
+      100% {
+        transform: translateY(-110vh) scale(1.3);
+        opacity: 0;
+      }
+    }
+
+    #network {
+      z-index: 0;
+    }
+
+    body > div.container {
+      background-color: rgba(255 255 255 / 0.25);
+      border-radius: 10px;
+      padding: 20px;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+      position: relative;
+      z-index: 1;
+    }
+
+    body.dark > div.container {
+      background-color: rgba(18 18 18 / 0.35);
+      box-shadow: 0 0 15px rgba(255,255,255,0.1);
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    #new-task {
+      width: 70%;
+      padding: 8px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    #add-btn {
+      padding: 9px 15px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-left: 5px;
+      border: none;
+      background-color: var(--primary);
+      color: white;
+      border-radius: 4px;
+      transition: background-color 0.3s;
+    }
+
+    #add-btn:hover {
+      background-color: #0056b3;
+    }
+
+    #filters {
+      margin: 15px 0;
+      text-align: center;
+    }
+
+    #filters button {
+      margin: 0 5px;
+      padding: 5px 12px;
+      cursor: pointer;
+      border: 1px solid var(--primary);
+      background: none;
+      color: var(--primary);
+      border-radius: 4px;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    #filters button.active {
+      background-color: var(--primary);
+      color: white;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin-top: 20px;
+    }
+
+    li {
+      background: rgba(242 242 242 / 0.75);
+      margin: 8px 0;
+      padding: 10px;
+      border-radius: 5px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: background-color 0.3s;
+    }
+
+    body.dark li {
+      background: rgba(51 51 51 / 0.7);
+    }
+
+    li.done label {
+      text-decoration: line-through;
+      color: #888;
+    }
+
+    input[type="checkbox"] {
+      margin-right: 15px;
+      transform: scale(1.2);
+      cursor: pointer;
+    }
+
+    label {
+      flex-grow: 1;
+      cursor: pointer;
+    }
+
+    label[contenteditable="true"] {
+      border-bottom: 1px dashed #aaa;
+      padding: 2px 4px;
+    }
+
+    .remove-btn {
+      background: var(--danger);
+      border: none;
+      color: white;
+      padding: 5px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+      margin-left: 10px;
+      transition: background-color 0.3s;
+    }
+
+    .remove-btn:hover {
+      background: #cc3c3c;
+    }
+
+    #clear-completed {
+      margin-top: 10px;
+      background: var(--danger);
+      border: none;
+      color: white;
+      padding: 7px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      display: block;
+      width: 100%;
+      font-size: 16px;
+      transition: background-color 0.3s;
+    }
+
+    #clear-completed:hover {
+      background: #cc3c3c;
+    }
+
+    #task-count {
+      margin-top: 10px;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    #dark-mode-toggle {
+  margin: 15px auto 30px auto;
+  display: block;
+  background: transparent;
+  border: rgb(10, 10, 8);
+  padding: 8px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+#dark-mode-toggle:hover {
+  background: rgb(255, 255, 255);
+  color: white;
+}
+
+    
+
+    /* Profile styles */
+    .profile {
+      display: flex;
+      align-items: center;
+      margin-bottom: 25px;
+      gap: 15px;
+      user-select: none;
+    }
+    .profile img {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid rgba(252, 0, 0, 0.815);
+      cursor: default;
+    }
+    .profile-info h2,
+    .profile-info p {
+      margin: 0;
+      cursor: text;
+    }
+    .profile-info h2[contenteditable="true"],
+    .profile-info p[contenteditable="true"] {
+      border-bottom: 1px dashed #aaa;
+      padding: 2px 4px;
+      user-select: text;
+    }
+  </style>
+</head>
+<body>
+  <div id="rain"></div>
+  <div id="bubbles"></div>
+  <canvas id="network"></canvas>
+
+  <div class="container">
+    <div class="profile">
+      <img src="4.jpg" alt="Profile Picture" />
+      <div class="profile-info">
+        <h2 id="profile-name" contenteditable="true" spellcheck="false" title="Click to edit your name">Kit Arvy</h2>
+        <p id="profile-title" contenteditable="true" spellcheck="false" title="Click to edit your title">Productivity Enthusiast</p>
+      </div>
+    </div>
+
+    <h1>Upgraded To-Do List</h1>
+    <input type="text" id="new-task" placeholder="Add a new task..." />
+    <button id="add-btn">Add</button>
+
+    <div id="filters">
+      <button data-filter="all" class="active">All</button>
+      <button data-filter="active">Active</button>
+      <button data-filter="completed">Completed</button>
+    </div>
+
+    <ul id="task-list"></ul>
+    <button id="clear-completed">Clear Completed Tasks</button>
+    <div id="task-count"></div>
+    <button id="dark-mode-toggle">🌙☀️</button>
+  </div>
+
+  <script>
+    const taskList = document.getElementById('task-list');
+    const addBtn = document.getElementById('add-btn');
+    const newTaskInput = document.getElementById('new-task');
+    const clearCompletedBtn = document.getElementById('clear-completed');
+    const taskCount = document.getElementById('task-count');
+    const filters = document.querySelectorAll('#filters button');
+    const darkModeToggle = document.getElementById('dark-mode-toggle');
+    const rainContainer = document.getElementById('rain');
+    const bubblesContainer = document.getElementById('bubbles');
+    const canvas = document.getElementById("network");
+    const ctx = canvas.getContext("2d");
+
+    let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+    let currentFilter = 'all';
+
+    function saveTasks() {
+      localStorage.setItem('tasks', JSON.stringify(tasks));
+    }
+
+    function updateTaskCount() {
+      const total = tasks.length;
+      const remaining = tasks.filter(t => !t.done).length;
+      taskCount.textContent = `Total: ${total} | Remaining: ${remaining}`;
+    }
+
+    function createTaskElement(task, index) {
+      const li = document.createElement('li');
+      if (task.done) li.classList.add('done');
+
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.checked = task.done;
+
+      const label = document.createElement('label');
+      label.textContent = task.text;
+
+      label.addEventListener('click', () => {
+        label.contentEditable = true;
+        label.focus();
+      });
+
+      label.addEventListener('blur', () => finishEdit());
+      label.addEventListener('keydown', e => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          label.blur();
+        }
+      });
+
+      function finishEdit() {
+        label.contentEditable = false;
+        const updatedText = label.textContent.trim();
+        if (updatedText) {
+          tasks[index].text = updatedText;
+          saveTasks();
+          renderTasks();
+        } else {
+          // If empty, remove task
+          tasks.splice(index, 1);
+          saveTasks();
+          renderTasks();
+        }
+      }
+
+      checkbox.addEventListener('change', () => {
+        tasks[index].done = checkbox.checked;
+        saveTasks();
+        renderTasks();
+      });
+
+      const removeBtn = document.createElement('button');
+      removeBtn.textContent = 'X';
+      removeBtn.className = 'remove-btn';
+      removeBtn.addEventListener('click', () => {
+        tasks.splice(index, 1);
+        saveTasks();
+        renderTasks();
+      });
+
+      li.appendChild(checkbox);
+      li.appendChild(label);
+      li.appendChild(removeBtn);
+      return li;
+    }
+
+    function renderTasks() {
+      taskList.innerHTML = '';
+      let filteredTasks = tasks;
+      if (currentFilter === 'active') {
+        filteredTasks = tasks.filter(t => !t.done);
+      } else if (currentFilter === 'completed') {
+        filteredTasks = tasks.filter(t => t.done);
+      }
+      filteredTasks.forEach((task, index) => {
+        taskList.appendChild(createTaskElement(task, tasks.indexOf(task)));
+      });
+      updateTaskCount();
+    }
+
+    addBtn.addEventListener('click', () => {
+      const text = newTaskInput.value.trim();
+      if (text) {
+        tasks.push({ text, done: false });
+        saveTasks();
+        newTaskInput.value = '';
+        renderTasks();
+      }
+    });
+
+    newTaskInput.addEventListener('keydown', e => {
+      if (e.key === 'Enter') addBtn.click();
+    });
+
+    clearCompletedBtn.addEventListener('click', () => {
+      tasks = tasks.filter(t => !t.done);
+      saveTasks();
+      renderTasks();
+    });
+
+    filters.forEach(btn => {
+      btn.addEventListener('click', () => {
+        filters.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentFilter = btn.getAttribute('data-filter');
+        renderTasks();
+      });
+    });
+
+    function toggleDarkMode() {
+      document.body.classList.toggle('dark');
+      localStorage.setItem('darkMode', document.body.classList.contains('dark'));
+    }
+
+    darkModeToggle.addEventListener('click', () => {
+      toggleDarkMode();
+      toggleAnimations();
+    });
+
+    // Load dark mode setting
+    if (localStorage.getItem('darkMode') === 'true') {
+      document.body.classList.add('dark');
+    }
+
+    // RAIN ANIMATION
+    function createDrop() {
+      const drop = document.createElement('div');
+      drop.className = 'drop';
+      drop.style.left = Math.random() * window.innerWidth + 'px';
+      drop.style.animationDuration = 0.5 + Math.random() * 0.5 + 's';
+      drop.style.animationDelay = Math.random() * 2 + 's';
+      drop.style.height = 10 + Math.random() * 20 + 'px';
+      drop.style.opacity = 0.3 + Math.random() * 0.7;
+      return drop;
+    }
+
+    function createRain() {
+      rainContainer.innerHTML = '';
+      const dropsCount = Math.floor(window.innerWidth / 4);
+      for (let i = 0; i < dropsCount; i++) {
+        rainContainer.appendChild(createDrop());
+      }
+    }
+
+    // BUBBLES ANIMATION
+    function createBubble() {
+      const bubble = document.createElement('div');
+      bubble.className = 'bubble';
+      const size = 10 + Math.random() * 30;
+      bubble.style.width = size + 'px';
+      bubble.style.height = size + 'px';
+      bubble.style.left = Math.random() * window.innerWidth + 'px';
+      bubble.style.animationDuration = 5 + Math.random() * 10 + 's';
+      bubble.style.animationDelay = Math.random() * 10 + 's';
+      return bubble;
+    }
+
+    function createBubbles() {
+      bubblesContainer.innerHTML = '';
+      const bubblesCount = Math.floor(window.innerWidth / 15);
+      for (let i = 0; i < bubblesCount; i++) {
+        bubblesContainer.appendChild(createBubble());
+      }
+    }
+
+    // NETWORK ANIMATION (canvas)
+    let width, height;
+    let points = [];
+
+    function initNetwork() {
+      resizeCanvas();
+      points = [];
+      const pointCount = Math.floor((width * height) / 8000);
+      for (let i = 0; i < pointCount; i++) {
+        points.push({
+          x: Math.random() * width,
+          y: Math.random() * height,
+          vx: (Math.random() - 0.5) * 0.5,
+          vy: (Math.random() - 0.5) * 0.5,
+        });
+      }
+    }
+
+    function resizeCanvas() {
+      width = window.innerWidth;
+      height = window.innerHeight;
+      canvas.width = width;
+      canvas.height = height;
+    }
+
+    function drawNetwork() {
+      ctx.clearRect(0, 0, width, height);
+
+      // Move points
+      points.forEach(p => {
+        p.x += p.vx;
+        p.y += p.vy;
+
+        if (p.x < 0 || p.x > width) p.vx = -p.vx;
+        if (p.y < 0 || p.y > height) p.vy = -p.vy;
+      });
+
+      // Draw points and lines
+      for (let i = 0; i < points.length; i++) {
+        let p1 = points[i];
+        ctx.beginPath();
+        ctx.arc(p1.x, p1.y, 2, 0, Math.PI * 2);
+        ctx.fillStyle = document.body.classList.contains('dark') ? 'rgba(180,220,255,0.7)' : 'rgba(0,0,0,0.3)';
+        ctx.fill();
+
+        for (let j = i + 1; j < points.length; j++) {
+          let p2 = points[j];
+          let dist = Math.hypot(p1.x - p2.x, p1.y - p2.y);
+          if (dist < 150) {
+            ctx.beginPath();
+            ctx.strokeStyle = document.body.classList.contains('dark') ? `rgba(180,220,255,${1 - dist/150})` : `rgba(0,0,0,${1 - dist/150})`;
+            ctx.lineWidth = 1;
+            ctx.moveTo(p1.x, p1.y);
+            ctx.lineTo(p2.x, p2.y);
+            ctx.stroke();
+          }
+        }
+      }
+
+      requestAnimationFrame(drawNetwork);
+    }
+
+    // TOGGLE ANIMATIONS BASED ON MODE
+    function toggleAnimations() {
+      if (document.body.classList.contains('dark')) {
+        rainContainer.style.display = 'block';
+        bubblesContainer.style.display = 'block';
+      } else {
+        rainContainer.style.display = 'none';
+        bubblesContainer.style.display = 'none';
+      }
+      canvas.style.display = 'block'; // Always show network animation
+    }
+
+    // Initialize everything on load
+    function init() {
+      createRain();
+      createBubbles();
+      initNetwork();
+      renderTasks();
+      toggleAnimations();
+      drawNetwork();
+    }
+
+    window.addEventListener('resize', () => {
+      createRain();
+      createBubbles();
+      initNetwork();
+    });
+
+    init();
+  </script>
+</body>
+</html>
