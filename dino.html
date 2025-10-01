@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Space Runner Ultra</title>
+<style>
+  body {
+    margin: 0;
+    background: radial-gradient(circle at center, #0b0d26, #000);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    font-family: Arial, sans-serif;
+    color: white;
+  }
+  .wrap {
+    width: 900px;
+    max-width: 95vw;
+    text-align: center;
+  }
+  canvas {
+    background: linear-gradient(#02010a, #0b0d26 60%, #111);
+    border: 2px solid #444;
+    border-radius: 8px;
+    width: 100%;
+    height: 180px;
+    display: block;
+    margin: auto;
+    touch-action: manipulation;
+  }
+  #score, #highscore { font-size: 18px; margin: 8px; }
+  #power { font-size: 16px; margin: 6px; color: gold; }
+  button {
+    padding: 8px 14px;
+    margin-top: 10px;
+    border: none;
+    border-radius: 6px;
+    background: #2196f3;
+    color: white;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🚀 Space Runner Ultra</h1>
+  <canvas id="game" width="800" height="200"></canvas>
+  <div>
+    <span id="score">Score: 0</span> | 
+    <span id="highscore">High: 0</span>
+  </div>
+  <div id="power"></div>
+  <button id="restart">Restart</button>
+  <p>(SPACE/UP = Jump, DOWN/ENTER = Shoot, TAP = Fly)</p>
+</div>
+
+<script>
+const canvas = document.getElementById('game');
+const ctx = canvas.getContext('2d');
+const W = canvas.width, H = canvas.height;
+
+let running = false, gameOver = false;
+let score = 0, high = localStorage.getItem("space_high") || 0;
+let speed = 5, gravity = 0.5, frames = 0;
+let lastBossScore = 0;
+
+document.getElementById("highscore").innerText = "High: " + high;
+
+// spaceship
+const ship = { x:60, y:H-50, w:40, h:30, vy:0, jump:-10, grounded:true, shield:false };
+
+// arrays
+let meteors = [], stars = [], coins = [], ufos = [], lasers = [], powers = [];
+
+// active power-ups
+let doubleScore=false, boost=false, powerTimer=0;
+
+// boss vars
+let boss = null;
+let bossBullets = [];
+
+// sounds
+function playBeep(freq=440, duration=150, type="sine", vol=0.2){
+  const ctxAudio = new (window.AudioContext||window.webkitAudioContext)();
+  const osc = ctxAudio.createOscillator();
+  const gain = ctxAudio.createGain();
+  osc.type = type; osc.frequency.value = freq;
+  osc.connect(gain); gain.connect(ctxAudio.destination);
+  gain.gain.value = vol;
+  osc.start(); osc.stop(ctxAudio.currentTime + duration/1000);
+}
+function sJump(){ playBeep(600,120,"square",0.15); }
+function sCoin(){ playBeep(880,150,"triangle",0.25); }
+function sCrash(){ playBeep(120,400,"sawtooth",0.3); }
+function sShoot(){ playBeep(1000,80,"square",0.2); }
+function sHit(){ playBeep(300,200,"sine",0.25); }
+function sPower(){ playBeep(700,300,"triangle",0.3); }
+
+// background loop
+let bgCtx;
+function startMusic(){
+  if (bgCtx && bgCtx.state !== "closed") return; // prevent overlapping
+  bgCtx = new (window.AudioContext||window.webkitAudioContext)();
+  const o = bgCtx.createOscillator();
+  const g = bgCtx.createGain();
+  o.type="sawtooth";
+  o.frequency.setValueAtTime(200,bgCtx.currentTime);
+  g.gain.setValueAtTime(0.05,bgCtx.currentTime);
+  o.connect(g); g.connect(bgCtx.destination);
+  o.start();
+  o.frequency.linearRampToValueAtTime(220,bgCtx.currentTime+1);
+  o.frequency.linearRampToValueAtTime(200,bgCtx.currentTime+2);
+  o.stop(bgCtx.currentTime+2);
+  o.onended=()=>startMusic();
+}
+
+// reset
+function reset(){
+  score=0; speed=5; frames=0; lastBossScore = 0;
+  meteors=[]; coins=[]; ufos=[]; lasers=[]; powers=[]; stars=[];
+  boss=null; bossBullets=[];
+  ship.y=H-50; ship.vy=0; ship.grounded=true; ship.shield=false;
+  doubleScore=false; boost=false; powerTimer=0;
+  running=true; gameOver=false;
+  loop();
+}
+
+// spawn
+function spawnMeteor(){ meteors.push({ x:W+20, y:H-40, w:30, h:30, hp:3 }); }
+function spawnCoin(){ coins.push({ x:W+20, y:H-80-Math.random()*60, r:8, taken:false }); }
+function spawnUfo(){ ufos.push({ x:W+20, y:50+Math.random()*80, w:40, h:20 }); }
+function spawnPower(){
+  const type = Math.floor(Math.random()*3);
+  powers.push({x:W+20, y:60+Math.random()*80, r:10, type});
+}
+function spawnBoss(){
+  boss = { x: W-140, y: 40, w: 120, h: 60, hp: 20, active: true, fireRate: 80, dir: 1 };
+}
+
+// jump & shoot
+function fly(){ if(gameOver){ reset(); return; } if(ship.grounded){ ship.vy=ship.jump; ship.grounded=false; sJump(); } }
+function shoot(){ if(!gameOver){ lasers.push({x:ship.x+ship.w, y:ship.y+ship.h/2, w:12, h:2}); sShoot(); } }
+
+// input
+window.addEventListener("keydown", e=>{
+  if(e.code==="Space"||e.code==="ArrowUp"){ e.preventDefault(); fly(); }
+  if(e.code==="ArrowDown"||e.code==="Enter"){ e.preventDefault(); shoot(); }
+});
+canvas.addEventListener("mousedown", () => {
+  if (!running) reset();
+  startMusic();
+  fly();
+});
+canvas.addEventListener("touchstart", e => {
+  e.preventDefault();
+  if (!running) reset();
+  startMusic();
+  fly();
+}, {passive:false});
+canvas.addEventListener("click", () => {
+  if (gameOver) reset();
+});
+document.getElementById("restart").onclick=reset;
+
+// loop
+function loop(){
+  if(!running) return;
+  frames++; ctx.clearRect(0,0,W,H);
+
+  // stars
+  if(frames % 10 === 0) stars.push({x:W, y:Math.random()*H*0.8, r:1+Math.random()*2});
+  for(let s of stars){ s.x -= 1; ctx.fillStyle="#fff"; ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2); ctx.fill(); }
+  stars = stars.filter(s=>s.x>0);
+
+  if(frames % 100===0) spawnMeteor();
+  if(frames % 180===0) spawnCoin();
+  if(frames % 400===0) spawnUfo();
+  if(frames % 600===0) spawnPower();
+
+  if(score > 0 && score % 500 === 0 && score !== lastBossScore && !boss){
+    spawnBoss();
+    lastBossScore = score;
+  }
+
+  for(let m of meteors){
+    m.x -= speed; ctx.fillStyle="#b33";
+    ctx.beginPath(); ctx.arc(m.x,m.y,m.w/2,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle="lime";
+    ctx.fillRect(m.x-15, m.y-25, (m.hp/3)*30, 4);
+    if(collide(ship,m)){ if(ship.shield){ ship.shield=false; m.x=-100; } else end(); }
+  }
+  meteors = meteors.filter(m=>m.x+m.w>0);
+
+  for(let c of coins){
+    c.x -= speed;
+    if(!c.taken){
+      ctx.fillStyle="gold"; ctx.beginPath(); ctx.arc(c.x,c.y,c.r,0,Math.PI*2); ctx.fill();
+      if(collideCircle(ship,c)){ c.taken=true; score+=doubleScore?100:50; sCoin(); }
+    }
+  }
+  coins = coins.filter(c=>c.x>0);
+
+  for(let u of ufos){
+    u.x -= speed*1.2; ctx.fillStyle="#6cf"; ctx.fillRect(u.x,u.y,u.w,u.h);
+    ctx.fillStyle="#fff"; ctx.fillRect(u.x+10,u.y-5,20,10);
+    if(collide(ship,u)){ if(ship.shield){ ship.shield=false; u.x=-100; } else end(); }
+  }
+  ufos = ufos.filter(u=>u.x+u.w>0);
+
+  for(let p of powers){
+    p.x -= speed;
+    ctx.fillStyle = p.type === 0 ? "cyan" : (p.type === 1 ? "violet" : "lime");
+    ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fill();
+    if(collideCircle(ship,p)){ activatePower(p.type); p.x=-100; }
+  }
+  powers = powers.filter(p=>p.x>0);
+
+  for(let l of lasers){
+    l.x += 10; ctx.fillStyle="red"; ctx.fillRect(l.x,l.y,l.w,l.h);
+    for(let m of meteors){ 
+      if(collide(l,m)){ l.x=W+100; m.hp--; sHit(); if(m.hp <= 0){ m.x=-100; score+= doubleScore?200:100; } } 
+    }
+    for(let u of ufos){ if(collide(l,u)){ u.x=-100; score+=doubleScore?400:200; sHit(); } }
+  }
+  lasers = lasers.filter(l=>l.x<W);
+
+  if(boss && boss.active){
+    boss.x -= speed*0.2;
+    boss.y += boss.dir * 1.5;
+    if(boss.y <= 40 || boss.y+boss.h >= H-60) boss.dir *= -1;
+
+    ctx.fillStyle = "#c6f"; ctx.fillRect(boss.x, boss.y, boss.w, boss.h);
+    ctx.fillStyle = "#fff"; ctx.fillRect(boss.x+20, boss.y-10, 80, 20);
+    ctx.fillStyle="red"; ctx.fillRect(W/2-60, 10, 120, 8);
+    ctx.fillStyle="lime"; ctx.fillRect(W/2-60, 10, (boss.hp/20)*120, 8);
+
+    if(frames % boss.fireRate === 0){
+      bossBullets.push({ x: boss.x, y: boss.y+boss.h/2, w: 10, h: 4, speed: 6 });
+    }
+
+    for(let l of lasers){
+      if(collide(l,boss)){
+        l.x=W+100; boss.hp--; sHit();
+        if(boss.hp<=0){ boss.active=false; boss=null; bossBullets=[]; score+=1000; }
+      }
+    }
+  }
+
+  for(let b of bossBullets){
+    b.x -= b.speed;
+    ctx.fillStyle="orange";
+    ctx.fillRect(b.x,b.y,b.w,b.h);
+    if(collide(ship,b)){ if(ship.shield){ ship.shield=false; b.x=-100; } else end(); }
+  }
+  bossBullets = bossBullets.filter(b=>b.x>0);
+
+  ship.vy += gravity; ship.y += ship.vy;
+  if(ship.y+ship.h >= H-20){ ship.y=H-20-ship.h; ship.vy=0; ship.grounded=true; }
+  drawShip();
+
+  if (!gameOver && frames % 6 === 0) score += doubleScore ? 2 : 1;
+  document.getElementById("score").innerText="Score: "+score;
+  if(score>high){ high=score; document.getElementById("highscore").innerText="High: "+high; }
+
+  if(powerTimer>0){ powerTimer--; if(powerTimer===0){ doubleScore=false; boost=false; document.getElementById("power").innerText=""; speed=5; } }
+
+  if(!gameOver) requestAnimationFrame(loop);
+}
+
+function drawShip(){
+  ctx.fillStyle="#39f"; ctx.fillRect(ship.x,ship.y,ship.w,ship.h);
+  ctx.fillStyle="#fff"; ctx.fillRect(ship.x+ship.w-8, ship.y+10,6,6);
+  ctx.fillStyle="#f33"; ctx.beginPath(); ctx.arc(ship.x+5,ship.y+ship.h/2,5,0,Math.PI*2); ctx.fill();
+  if(ship.shield){ ctx.strokeStyle="cyan"; ctx.lineWidth=2; ctx.beginPath(); ctx.arc(ship.x+ship.w/2,ship.y+ship.h/2,25,0,Math.PI*2); ctx.stroke(); }
+}
+
+function collide(a,b){ return !(a.x+a.w<b.x || a.x>b.x+b.w || a.y+a.h<b.y || a.y>b.y+b.h); }
+function collideCircle(a,c){
+  let cx=c.x, cy=c.y, r=c.r;
+  let closestX = Math.max(a.x, Math.min(cx, a.x+a.w));
+  let closestY = Math.max(a.y, Math.min(cy, a.y+a.h));
+  let dx = cx-closestX, dy=cy-closestY;
+  return (dx*dx+dy*dy)<=r*r;
+}
+
+function activatePower(type){
+  sPower();
+  if(type===0){ ship.shield=true; document.getElementById("power").innerText="🛡 Shield Active"; }
+  if(type===1){ doubleScore=true; powerTimer=600; document.getElementById("power").innerText="✨ Double Score!"; }
+  if(type===2){ boost=true; powerTimer=400; speed=8; document.getElementById("power").innerText="💨 Speed Boost!"; }
+}
+
+function end(){
+  running=false; gameOver=true; sCrash();
+  ctx.fillStyle="rgba(0,0,0,0.5)"; ctx.fillRect(0,0,W,H);
+  ctx.fillStyle="white"; ctx.font="20px Arial"; ctx.textAlign="center";
+  ctx.fillText("Game Over!",W/2,H/2-10);
+  ctx.font="14px Arial"; ctx.fillText("Press Restart or Space to play again",W/2,H/2+20);
+  localStorage.setItem("space_high",high);
+}
+
+reset();
+</script>
+</body>
+</html>
